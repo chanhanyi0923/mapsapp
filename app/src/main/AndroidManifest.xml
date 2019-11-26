@@ -14,6 +14,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar"
         android:usesCleartextTraffic="true">
+        <activity android:name=".EventInfoActivity"></activity>
+        <activity
+            android:name=".InfoListActivity"
+            android:label="@string/title_activity_info_list" />
         <activity android:name=".WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,8 +25,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MapViewActivity">
-        </activity>
+        <activity android:name=".MapViewActivity" />
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"

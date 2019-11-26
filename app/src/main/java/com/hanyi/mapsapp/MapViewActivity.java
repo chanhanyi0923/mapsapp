@@ -6,7 +6,9 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -22,11 +24,15 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MapViewActivity extends AppCompatActivity {
     private static final int ALL_PERMISSIONS_RESULT = 1011;
@@ -36,6 +42,8 @@ public class MapViewActivity extends AppCompatActivity {
     private GoogleMap googleMap;
     private DataProvider dataProvider;
     private static final String MAP_VIEW_BUNDLE_KEY = "AIzaSyBBuLO0MI2rg0vwTomfq6_O-MOfE21uD0Y";
+
+    private HashMap<Integer, String> markerTags;
 
     private void initBottomNavigationView() {
         BottomNavigationView navigation = findViewById(R.id.navigation);
@@ -61,17 +69,65 @@ public class MapViewActivity extends AppCompatActivity {
         });
     }
 
+    private void initDrawCircle() {
+        markerTags = new HashMap<>();
+
+        Button drawCircleButton = findViewById(R.id.drawCircleButton);
+        drawCircleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LatLng loc = new LatLng(25.033710, 121.564718);
+
+                int tagNumber = 1111;
+                markerTags.put(tagNumber, "aaaa");
+                MarkerOptions pin = new MarkerOptions().position(loc).title("you are here");
+                Marker marker = googleMap.addMarker(pin);
+                marker.setTag(tagNumber);
+                googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker) {
+                        int tagNumber = (int)marker.getTag();
+                        String value = markerTags.get(tagNumber);
+
+                        // EventInfoActivity
+                        Intent intent = new Intent(MapViewActivity.this, EventInfoActivity.class);
+
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("KEY", value);
+                        intent.putExtras(bundle);
+
+                        startActivity(intent);
+                        return false;
+                    }
+                });
+
+
+                Circle circle = googleMap.addCircle(new CircleOptions()
+                    .center(loc)
+                    .radius(10000)
+                    .strokeColor(Color.RED)
+                    .fillColor(Color.argb(128, 0, 0, 255))
+                );
+
+                //circle.remove();
+            }
+        });
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_map_view);
 
         locationLabel = findViewById(R.id.locationLabel);
         initMapView(savedInstanceState);
         initLocationManager();
         initGetLocationButton();
-        initBottomNavigationView();
         dataProvider = DataProvider.getInstance(getApplicationContext());
+
+        // test
+        initDrawCircle();
+        initBottomNavigationView();
     }
 
     private void initMapView(Bundle savedInstanceState) {
@@ -82,8 +138,8 @@ public class MapViewActivity extends AppCompatActivity {
             public void onMapReady(GoogleMap googleMap_) {
                 googleMap = googleMap_;
                 googleMap.setMinZoomPreference(12);
-                LatLng ny = new LatLng(40.7143528, -74.0059731);
-                googleMap.moveCamera(CameraUpdateFactory.newLatLng(ny));
+                LatLng center = new LatLng(25.033710, 121.564718);
+                googleMap.moveCamera(CameraUpdateFactory.newLatLng(center));
             }
         });
     }
