@@ -1,5 +1,6 @@
 package com.hanyi.mapsapp;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -11,9 +12,11 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -21,16 +24,42 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MapViewActivity extends AppCompatActivity {
     private static final int ALL_PERMISSIONS_RESULT = 1011;
     private TextView locationLabel;
     private LocationManager locationManager;
     private MapView mapView;
     private GoogleMap googleMap;
+    private DataProvider dataProvider;
     private static final String MAP_VIEW_BUNDLE_KEY = "AIzaSyBBuLO0MI2rg0vwTomfq6_O-MOfE21uD0Y";
+
+    private void initBottomNavigationView() {
+        BottomNavigationView navigation = findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                if (menuItem.getItemId() == R.id.action_search) {
+                    dataProvider.getAlarmInfo(new IDataCallback<AlarmInfo>() {
+                        @Override
+                        public void onComplete(AlarmInfo result) {
+                            Toast.makeText(getApplicationContext(), result.content, Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onFailed(Exception exception) {
+
+                        }
+                    });
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
         initMapView(savedInstanceState);
         initLocationManager();
         initGetLocationButton();
+        initBottomNavigationView();
+        dataProvider = DataProvider.getInstance(getApplicationContext());
     }
 
     private void initMapView(Bundle savedInstanceState) {
@@ -158,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, new LocationListener() {
                 @Override
                 public void onLocationChanged(Location location) {
-                    updateUserLocation(location);
+                    // updateUserLocation(location);
                 }
 
                 @Override
