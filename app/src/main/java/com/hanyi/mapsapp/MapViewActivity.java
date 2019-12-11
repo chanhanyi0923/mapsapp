@@ -30,6 +30,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -128,6 +129,10 @@ public class MapViewActivity extends AppCompatActivity {
         // test
         initDrawCircle();
         initBottomNavigationView();
+
+        // test
+        Gson g = new Gson();
+        System.err.println(g.toJson(User.getLoggedInUser()));
     }
 
     private void initMapView(Bundle savedInstanceState) {

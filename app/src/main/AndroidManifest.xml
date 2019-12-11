@@ -14,7 +14,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar"
         android:usesCleartextTraffic="true">
-        <activity android:name=".EventInfoActivity"></activity>
+        <activity android:name=".LoginActivity"></activity>
+        <activity android:name=".EventInfoActivity" />
         <activity
             android:name=".InfoListActivity"
             android:label="@string/title_activity_info_list" />

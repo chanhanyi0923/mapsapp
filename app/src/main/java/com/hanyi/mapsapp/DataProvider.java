@@ -9,6 +9,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class DataProvider {
     private static DataProvider instance;
@@ -27,7 +31,7 @@ public class DataProvider {
     }
 
     public void getAlarmInfo(final IDataCallback<AlarmInfo> callback) {
-        String url = BASE_URL + "/get_alarm_info";
+        String url = BASE_URL + "/get_alarm_info/";
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
             new Response.Listener<String>() {
@@ -47,6 +51,49 @@ public class DataProvider {
                 }
             }
         );
+
+        queue.add(stringRequest);
+    }
+
+    public void signIn(final String username, final String password, final IDataCallback<User> callback) {
+        String url = BASE_URL + "/login_user_account/";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+            new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    Gson gson = new Gson();
+                    Map map = gson.fromJson(response, Map.class);
+                    try {
+                        if ("Success".equals(map.get("message"))) {
+                            System.err.println(gson.toJson(map.get("account")));
+                            User user = gson.fromJson(gson.toJson(map.get("account")), User.class);
+                            user.token = map.get("token").toString();
+                            callback.onComplete(user);
+                        }
+                    } catch (Exception e) {
+                        Exception e2 = new Exception("bad response: ", e);
+                        callback.onFailed(e2);
+                    }
+                }
+            },
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Exception e = new Exception("http failed");
+                    callback.onFailed(e);
+                }
+            }
+        ) {
+            @Override
+            protected Map<String, String> getParams()
+            {
+                Map<String, String>  params = new HashMap<>();
+                params.put("user_name", username);
+                params.put("password", password);
+                return params;
+            }
+        };
 
         queue.add(stringRequest);
     }
