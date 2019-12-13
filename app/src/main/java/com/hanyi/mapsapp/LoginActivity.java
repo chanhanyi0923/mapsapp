@@ -29,7 +29,7 @@ public class LoginActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(User user) {
                             User.setLoggedInUser(user);
-                            Intent intent = new Intent(LoginActivity.this, MapViewActivity.class);
+                            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                             startActivity(intent);
                         }
 

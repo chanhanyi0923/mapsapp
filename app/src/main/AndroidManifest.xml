@@ -14,10 +14,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar"
         android:usesCleartextTraffic="true">
-        <activity android:name=".LoginActivity"></activity>
-        <activity android:name=".EventInfoActivity" />
+        <activity android:name=".HomeActivity"></activity>
+        <activity android:name=".LoginActivity" />
         <activity
-            android:name=".InfoListActivity"
+            android:name=".SearchFriendsActivity"
             android:label="@string/title_activity_info_list" />
         <activity android:name=".WelcomeActivity">
             <intent-filter>

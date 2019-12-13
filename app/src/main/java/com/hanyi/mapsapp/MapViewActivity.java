@@ -1,12 +1,7 @@
 package com.hanyi.mapsapp;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -14,11 +9,14 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.MenuItem;
+import android.util.SparseArray;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -30,109 +28,32 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class MapViewActivity extends AppCompatActivity {
     private static final int ALL_PERMISSIONS_RESULT = 1011;
-    private TextView locationLabel;
     private LocationManager locationManager;
     private MapView mapView;
     private GoogleMap googleMap;
     private DataProvider dataProvider;
+    private TextView cardTitle;
+    private TextView cardContent;
+    private CardView mapViewMessageCard;
     private static final String MAP_VIEW_BUNDLE_KEY = "AIzaSyBBuLO0MI2rg0vwTomfq6_O-MOfE21uD0Y";
 
-    private HashMap<Integer, String> markerTags;
-
-    private void initBottomNavigationView() {
-        BottomNavigationView navigation = findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                if (menuItem.getItemId() == R.id.action_search) {
-                    dataProvider.getAlarmInfo(new IDataCallback<AlarmInfo>() {
-                        @Override
-                        public void onComplete(AlarmInfo result) {
-                            Toast.makeText(getApplicationContext(), result.content, Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void onFailed(Exception exception) {
-
-                        }
-                    });
-                    return true;
-                }
-                return false;
-            }
-        });
-    }
-
-    private void initDrawCircle() {
-        markerTags = new HashMap<>();
-
-        Button drawCircleButton = findViewById(R.id.drawCircleButton);
-        drawCircleButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                LatLng loc = new LatLng(25.033710, 121.564718);
-
-                int tagNumber = 1111;
-                markerTags.put(tagNumber, "aaaa");
-                MarkerOptions pin = new MarkerOptions().position(loc).title("you are here");
-                Marker marker = googleMap.addMarker(pin);
-                marker.setTag(tagNumber);
-                googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                    @Override
-                    public boolean onMarkerClick(Marker marker) {
-                        int tagNumber = (int)marker.getTag();
-                        String value = markerTags.get(tagNumber);
-
-                        // EventInfoActivity
-                        Intent intent = new Intent(MapViewActivity.this, EventInfoActivity.class);
-
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable("KEY", value);
-                        intent.putExtras(bundle);
-
-                        startActivity(intent);
-                        return false;
-                    }
-                });
-
-
-                Circle circle = googleMap.addCircle(new CircleOptions()
-                    .center(loc)
-                    .radius(10000)
-                    .strokeColor(Color.RED)
-                    .fillColor(Color.argb(128, 0, 0, 255))
-                );
-
-                //circle.remove();
-            }
-        });
-    }
+    private SparseArray<AlarmInfo> markerTags;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map_view);
 
-        locationLabel = findViewById(R.id.locationLabel);
+        dataProvider = DataProvider.getInstance(getApplicationContext());
+        markerTags = new SparseArray<>();
+        initCard();
         initMapView(savedInstanceState);
         initLocationManager();
-        initGetLocationButton();
-        dataProvider = DataProvider.getInstance(getApplicationContext());
-
-        // test
-        initDrawCircle();
-        initBottomNavigationView();
-
-        // test
-        Gson g = new Gson();
-        System.err.println(g.toJson(User.getLoggedInUser()));
     }
 
     private void initMapView(Bundle savedInstanceState) {
@@ -142,9 +63,13 @@ public class MapViewActivity extends AppCompatActivity {
             @Override
             public void onMapReady(GoogleMap googleMap_) {
                 googleMap = googleMap_;
-                googleMap.setMinZoomPreference(12);
-                LatLng center = new LatLng(25.033710, 121.564718);
-                googleMap.moveCamera(CameraUpdateFactory.newLatLng(center));
+                googleMap.setMinZoomPreference(5);
+
+                try {
+                    Location center = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    updateUserLocation(center);
+                } catch (SecurityException e) {
+                }
             }
         });
     }
@@ -201,29 +126,29 @@ public class MapViewActivity extends AppCompatActivity {
     private void updateUserLocation(Location location) {
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
-        locationLabel.setText("lat: " + String.format("%.2f", latitude) + ", long: " + String.format("%.2f", longitude));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 15));
-        LatLng loc = new LatLng(latitude, longitude);
-        googleMap.addMarker(new MarkerOptions().position(loc).title("you are here"));
+//        locationLabel.setText("lat: " + String.format("%.2f", latitude) + ", long: " + String.format("%.2f", longitude));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 5));
+//        LatLng loc = new LatLng(latitude, longitude);
+//        googleMap.addMarker(new MarkerOptions().position(loc).title("you are here"));
     }
 
-    private void initGetLocationButton() {
-        Button getLocationButton = findViewById(R.id.getLocationButton);
-        getLocationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                    updateUserLocation(lastKnownLocation);
-                } catch (SecurityException e) {
-                    locationLabel.setText("permission rejected");
-                }
-            }
-        });
-    }
+//    private void initGetLocationButton() {
+//        Button getLocationButton = findViewById(R.id.getLocationButton);
+//        getLocationButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                try {
+//                    Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+//                    updateUserLocation(lastKnownLocation);
+//                } catch (SecurityException e) {
+//                    locationLabel.setText("permission rejected");
+//                }
+//            }
+//        });
+//    }
 
     private void initLocationManager() {
-        ArrayList<String> permissions = new ArrayList();
+        ArrayList<String> permissions = new ArrayList<>();
         permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
         permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
 
@@ -250,7 +175,7 @@ public class MapViewActivity extends AppCompatActivity {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, new LocationListener() {
                 @Override
                 public void onLocationChanged(Location location) {
-                    // updateUserLocation(location);
+//                    updateUserLocation(location);
                 }
 
                 @Override
@@ -265,6 +190,78 @@ public class MapViewActivity extends AppCompatActivity {
                 public void onStatusChanged(String provider, int status, Bundle extras) {
                 }
             });
+
+            putAlerts();
         }
+    }
+
+    private void putAlerts() {
+        try {
+            Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (lastKnownLocation != null) {
+                dataProvider.getAlarmInfo(
+                    lastKnownLocation.getLatitude(),
+                    lastKnownLocation.getLongitude(),
+                    new IDataCallback<ArrayList<AlarmInfo>>() {
+                        @Override
+                        public void onComplete(ArrayList<AlarmInfo> alarmInfos) {
+                            for (AlarmInfo alarmInfo : alarmInfos) {
+                                drawCircle(alarmInfo);
+                            }
+                        }
+
+                        @Override
+                        public void onFailed(Exception exception) {
+                        }
+                    }
+                );
+            }
+        } catch (SecurityException e){
+        }
+    }
+
+    private void initCard() {
+        cardTitle = findViewById(R.id.cardTitle);
+        cardContent = findViewById(R.id.cardContent);
+        mapViewMessageCard = findViewById(R.id.mapViewMessageCard);
+        Button exitCardButton = findViewById(R.id.exitCardButton);
+        exitCardButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mapViewMessageCard.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    private void drawCircle(AlarmInfo alarmInfo) {
+        LatLng loc = new LatLng(alarmInfo.latitude, alarmInfo.longitude);
+        MarkerOptions pin = new MarkerOptions().position(loc);//.title("you are here");
+        Marker marker = googleMap.addMarker(pin);
+
+        markerTags.put(alarmInfo.hashCode(), alarmInfo);
+        marker.setTag(alarmInfo.hashCode());
+        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                int tag = (int)marker.getTag();
+                try {
+                    AlarmInfo alarmInfo_ = markerTags.get(tag);
+                    cardTitle.setText(alarmInfo_.getSignalTypeName(getApplicationContext()));
+                    cardContent.setText(alarmInfo_.content);
+                    mapViewMessageCard.setVisibility(View.VISIBLE);
+                } catch (Exception e) {
+                    mapViewMessageCard.setVisibility(View.GONE);
+                }
+                return false;
+            }
+        });
+
+        Circle circle = googleMap.addCircle(new CircleOptions()
+            .center(loc)
+            .radius(100000)
+            .strokeColor(Color.argb(128, 0, 0, 0))
+            .strokeWidth(5)
+            .fillColor(alarmInfo.getSignalLevelColor())
+        );
     }
 }

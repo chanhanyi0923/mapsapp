@@ -1,7 +1,6 @@
 package com.hanyi.mapsapp;
 
 import android.content.Context;
-import android.provider.ContactsContract;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -10,7 +9,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,17 +32,22 @@ public class DataProvider {
         return instance;
     }
 
-    public void getAlarmInfo(final IDataCallback<AlarmInfo> callback) {
-        String url = BASE_URL + "/get_alarm_info/";
+    public void getAlarmInfo(final double latitude, final double longitude, final IDataCallback<ArrayList<AlarmInfo>> callback) {
+        String url = BASE_URL + "/get_alarm_info/?latitude=" + latitude + "&longitude=" + longitude;
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
             new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    AlarmInfo alarmInfo = new AlarmInfo();
-                    alarmInfo.content = response;
-                    // TrafficResult[] results = new Gson().fromJson(sb.toString(),TrafficResult[].class);
-                    callback.onComplete(alarmInfo);
+                    try {
+                        Gson gson = new Gson();
+                        Type listType = new TypeToken<ArrayList<AlarmInfo>>(){}.getType();
+                        ArrayList<AlarmInfo> alarmInfos = gson.fromJson(response, listType);
+                        callback.onComplete(alarmInfos);
+                    } catch (Exception e) {
+                        Exception e2 = new Exception("bad response: ", e);
+                        callback.onFailed(e2);
+                    }
                 }
             },
             new Response.ErrorListener() {
@@ -95,6 +102,43 @@ public class DataProvider {
             }
         };
 
+        queue.add(stringRequest);
+    }
+
+    public void searchFriends(String name, final IDataCallback<ArrayList<User>> callback) {
+        final String url = BASE_URL + "/find_accounts/?name=" + name;
+        final String token = User.getLoggedInUser().token;
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            Gson gson = new Gson();
+                            Type listType = new TypeToken<ArrayList<User>>(){}.getType();
+                            ArrayList<User> users = gson.fromJson(response, listType);
+                            callback.onComplete(users);
+                        } catch (Exception e) {
+                            Exception e2 = new Exception("bad response: ", e);
+                            callback.onFailed(e2);
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Exception e = new Exception("http failed");
+                        callback.onFailed(e);
+                    }
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> params = new HashMap<>();
+                params.put("Authorization", "Bearer " + token);
+                return params;
+            }
+        };
         queue.add(stringRequest);
     }
 }
