@@ -27,6 +27,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".MapViewActivity" />
+        <activity android:name=".SignUpActivity" />
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"

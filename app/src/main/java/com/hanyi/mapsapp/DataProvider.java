@@ -105,6 +105,50 @@ public class DataProvider {
         queue.add(stringRequest);
     }
 
+    public void signUp(final String username, final String password, final String residentId, final String firstName, final String lastName, final String phoneNumber, final IDataCallback<Boolean> callback) {
+        String url = BASE_URL + "/create_user_account/";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+            new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    Gson gson = new Gson();
+                    Map map = gson.fromJson(response, Map.class);
+                    try {
+                        if ("Success".equals(map.get("message"))) {
+                            callback.onComplete(true);
+                        }
+                    } catch (Exception e) {
+                        Exception e2 = new Exception("bad response: ", e);
+                        callback.onFailed(e2);
+                    }
+                }
+            },
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Exception e = new Exception("http failed");
+                    callback.onFailed(e);
+                }
+            }
+        ) {
+            @Override
+            protected Map<String, String> getParams()
+            {
+                Map<String, String>  params = new HashMap<>();
+                params.put("user_name", username);
+                params.put("password", password);
+                params.put("resident_id", residentId);
+                params.put("first_name", firstName);
+                params.put("last_name", lastName);
+                params.put("phone_number", phoneNumber);
+                return params;
+            }
+        };
+
+        queue.add(stringRequest);
+    }
+
     public void searchFriends(String name, final IDataCallback<ArrayList<User>> callback) {
         final String url = BASE_URL + "/find_accounts/?name=" + name;
         final String token = User.getLoggedInUser().token;
