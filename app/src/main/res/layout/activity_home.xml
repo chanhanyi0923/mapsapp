@@ -25,9 +25,10 @@
 
                 <ImageButton
                     android:id="@+id/toMapViewButton"
-                    android:layout_height="wrap_content"
                     android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:adjustViewBounds="true"
+                    android:contentDescription="@string/view_map"
                     android:scaleType="fitXY"
                     app:layout_constraintBottom_toTopOf="@+id/toMapViewLabel"
                     app:layout_constraintTop_toTopOf="parent"
@@ -51,9 +52,10 @@
 
                 <ImageButton
                     android:id="@+id/toExploreButton"
-                    android:layout_height="wrap_content"
                     android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:adjustViewBounds="true"
+                    android:contentDescription="@string/explore"
                     android:scaleType="fitXY"
                     app:layout_constraintBottom_toTopOf="@+id/toExploreLabel"
                     app:layout_constraintTop_toTopOf="parent"
@@ -82,9 +84,10 @@
 
                 <ImageButton
                     android:id="@+id/toFindFriendsButton"
-                    android:layout_height="wrap_content"
                     android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:adjustViewBounds="true"
+                    android:contentDescription="@string/find_friends"
                     android:scaleType="fitXY"
                     app:layout_constraintBottom_toTopOf="@+id/toFindFriendsLabel"
                     app:layout_constraintTop_toTopOf="parent"
