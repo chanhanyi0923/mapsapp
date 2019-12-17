@@ -5,4 +5,5 @@
     <dimen name="size_label">36sp</dimen>
     <dimen name="margin_plain_text">20dp</dimen>
     <dimen name="margin_constraint_layout">55dp</dimen>
+    <dimen name="post_height">240dp</dimen>
 </resources>
