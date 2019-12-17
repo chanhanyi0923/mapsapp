@@ -37,8 +37,8 @@ public class HomeActivity extends AppCompatActivity {
         toExploreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent(HomeActivity.this, MapViewActivity.class);
-//                startActivity(intent);
+                Intent intent = new Intent(HomeActivity.this, ExploreActivity.class);
+                startActivity(intent);
             }
         });
     }
