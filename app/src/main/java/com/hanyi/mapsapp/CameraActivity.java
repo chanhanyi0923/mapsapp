@@ -60,6 +60,7 @@ import com.google.ar.core.Plane;
 import com.google.ar.core.Point;
 import com.google.ar.core.Point.OrientationMode;
 import com.google.ar.core.PointCloud;
+import com.google.ar.core.Pose;
 import com.google.ar.core.Session;
 import com.google.ar.core.SharedCamera;
 import com.google.ar.core.Trackable;
@@ -775,6 +776,29 @@ public class CameraActivity extends AppCompatActivity
         }
     }
 
+    private void putAlarmInfos(Frame frame, Camera camera) {
+        if (camera.getTrackingState() == TrackingState.TRACKING) {
+            anchors.clear();
+            // Hits are sorted by depth. Consider only closest hit on a plane or oriented point.
+            // Cap the number of objects created. This avoids overloading both the
+            // rendering system and ARCore.
+            if (anchors.size() >= 20) {
+                anchors.get(0).anchor.detach();
+                anchors.remove(0);
+            }
+
+
+            float[] objColor = new float[] {139.0f, 195.0f, 74.0f, 255.0f};
+
+            // TODO: put alarm info
+            // position of robot
+            float[] transform = new float[] {2.0f, 2.0f, 0.0f};
+            float[] rotation = new float[] {0.0f, 0.0f, 0.0f, 0.0f};
+            Anchor anchor = sharedSession.createAnchor(new Pose(transform, rotation));
+            anchors.add(new ColoredAnchor(anchor, objColor));
+        }
+    }
+
     // GL surface changed callback. Will be called on the GL thread.
     @Override
     public void onSurfaceChanged(GL10 gl, final int width, final int height) {
@@ -859,9 +883,8 @@ public class CameraActivity extends AppCompatActivity
         // ARCore attached the surface to GL context using the texture ID we provided
         // in createCameraPreviewSession() via sharedSession.setCameraTextureName(…).
         isGlAttached = true;
-
-        // Handle screen tap.
-        handleTap(frame, camera);
+        
+        putAlarmInfos(frame, camera);
 
         // If frame is ready, render camera preview image to the GL surface.
         backgroundRenderer.draw(frame);
