@@ -60,6 +60,6 @@ public class Post {
 
     public String getSignalTypeName(Context context) {
         String[] signalTypeArray = context.getResources().getStringArray(R.array.signal_type_array);
-        return signalTypeArray[this.signalType];
+        return signalTypeArray[this.signalType - 1];
     }
 }

@@ -110,7 +110,6 @@ public class PostActivity extends AppCompatActivity {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, new LocationListener() {
                 @Override
                 public void onLocationChanged(Location location) {
-//                    updateUserLocation(location);
                 }
 
                 @Override

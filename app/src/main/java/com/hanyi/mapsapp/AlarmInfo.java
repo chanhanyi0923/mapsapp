@@ -29,7 +29,7 @@ public class AlarmInfo {
 
     public String getSignalTypeName(Context context) {
         String[] signalTypeArray = context.getResources().getStringArray(R.array.signal_type_array);
-        return signalTypeArray[this.signalType];
+        return signalTypeArray[this.signalType - 1];
     }
 
     public int getSignalLevelColor() {
