@@ -189,7 +189,7 @@ public class DataProvider {
         queue.add(stringRequest);
     }
 
-    public void postEmergencyPost(final int id, final double latitude, final double longitude,
+    public void postEmergencyPost(final double latitude, final double longitude,
                                   final int signalType, final int signalLevel, final String message,
                                   final int peopleNum, final IDataCallback<Boolean> callback) {
         String url = BASE_URL + "/post_emergency_post/";
@@ -229,7 +229,7 @@ public class DataProvider {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-                params.put("account_id", String.valueOf(id));
+                params.put("account_id", String.valueOf(User.getLoggedInUser().id));
                 params.put("latitude", String.valueOf(latitude));
                 params.put("longitude", String.valueOf(longitude));
                 params.put("signal_type", String.valueOf(signalType));
