@@ -7,11 +7,13 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -27,9 +29,6 @@ public class SearchFriendsActivity extends AppCompatActivity {
         final ImageButton searchFriendsButton = findViewById(R.id.searchFriendsButton);
         final EditText searchFriendsEditText = findViewById(R.id.searchFriendsEditText);
 
-        //String[] str = {"新北市","台北市","台中市","台南市","高雄市"};
-
-
         searchFriendsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -42,7 +41,11 @@ public class SearchFriendsActivity extends AppCompatActivity {
                         for (User friend: friends) {
                             friendNames.add(friend.firstName + " " + friend.lastName);
                         }
-                        ArrayAdapter adapter = new ArrayAdapter(SearchFriendsActivity.this, android.R.layout.simple_list_item_1, friendNames);
+                        ArrayAdapter adapter = new ArrayAdapter(
+                            SearchFriendsActivity.this,
+                            android.R.layout.simple_list_item_1,
+                            friendNames
+                        );
                         listView.setAdapter(adapter);
                     }
 
@@ -51,6 +54,14 @@ public class SearchFriendsActivity extends AppCompatActivity {
                         //
                     }
                 });
+            }
+        });
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
+                String item = (String) listView.getItemAtPosition(position);
+                Toast.makeText(getApplicationContext(), "You selected : " + item, Toast.LENGTH_SHORT).show();
             }
         });
     }
