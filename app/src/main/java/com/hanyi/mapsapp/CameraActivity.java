@@ -16,7 +16,9 @@ package com.hanyi.mapsapp;
  */
 
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -27,6 +29,9 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.TotalCaptureResult;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.media.Image;
 import android.media.ImageReader;
 import android.opengl.GLES20;
@@ -49,7 +54,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.Camera;
@@ -65,6 +72,7 @@ import com.google.ar.core.Session;
 import com.google.ar.core.SharedCamera;
 import com.google.ar.core.Trackable;
 import com.google.ar.core.TrackingState;
+import com.google.maps.android.SphericalUtil;
 import com.hanyi.mapsapp.common.helpers.CameraPermissionHelper;
 import com.hanyi.mapsapp.common.helpers.DisplayRotationHelper;
 import com.hanyi.mapsapp.common.helpers.FullScreenHelper;
@@ -81,6 +89,7 @@ import com.google.ar.core.exceptions.UnavailableException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -180,7 +189,7 @@ public class CameraActivity extends AppCompatActivity
     // Renderers, see hello_ar_java sample to learn more.
     private final BackgroundRenderer backgroundRenderer = new BackgroundRenderer();
     private final ObjectRenderer virtualObject = new ObjectRenderer();
-    private final ObjectRenderer virtualObjectShadow = new ObjectRenderer();
+    //private final ObjectRenderer virtualObjectShadow = new ObjectRenderer();
     private final PlaneRenderer planeRenderer = new PlaneRenderer();
     private final PointCloudRenderer pointCloudRenderer = new PointCloudRenderer();
 
@@ -202,6 +211,11 @@ public class CameraActivity extends AppCompatActivity
 
     // A check mechanism to ensure that the camera closed properly so that the app can safely exit.
     private final ConditionVariable safeToExitApp = new ConditionVariable();
+
+    private static final int ALL_PERMISSIONS_RESULT = 1011;
+    private LocationManager locationManager;
+    private ArrayList<AlarmInfo> allAlarmInfos;
+    private LatLng userLocation;
 
     private static class ColoredAnchor {
         public final Anchor anchor;
@@ -342,6 +356,79 @@ public class CameraActivity extends AppCompatActivity
                 }
             };
 
+    private void initLocationManager() {
+        ArrayList<String> permissions = new ArrayList<>();
+        permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (permissions.size() > 0) {
+                requestPermissions(permissions.toArray(new String[permissions.size()]), ALL_PERMISSIONS_RESULT);
+            }
+        }
+
+        boolean granted = true;
+        final String usedPermissions[] = {
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
+        };
+        for (String permission : usedPermissions) {
+            if (PackageManager.PERMISSION_GRANTED != ContextCompat.checkSelfPermission(this, permission)) {
+                granted = false;
+                break;
+            }
+        }
+
+        if (granted) {
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, new LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
+//                    updateUserLocation(location);
+                }
+
+                @Override
+                public void onProviderDisabled(String provider) {
+                }
+
+                @Override
+                public void onProviderEnabled(String provider) {
+                }
+
+                @Override
+                public void onStatusChanged(String provider, int status, Bundle extras) {
+                }
+            });
+
+            putAlerts();
+        }
+    }
+
+    private void putAlerts() {
+        try {
+            allAlarmInfos = new ArrayList<>();
+            Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            userLocation = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
+            if (lastKnownLocation != null) {
+                DataProvider.getInstance(getApplicationContext()).getAlarmInfo(
+                        lastKnownLocation.getLatitude(),
+                        lastKnownLocation.getLongitude(),
+                        new IDataCallback<ArrayList<AlarmInfo>>() {
+                            @Override
+                            public void onComplete(ArrayList<AlarmInfo> alarmInfos) {
+                                allAlarmInfos = alarmInfos;
+                            }
+
+                            @Override
+                            public void onFailed(Exception exception) {
+                            }
+                        }
+                );
+            }
+        } catch (SecurityException e){
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -390,6 +477,9 @@ public class CameraActivity extends AppCompatActivity
 
         messageSnackbarHelper.setMaxLines(4);
         updateSnackbarMessage();
+
+        initLocationManager();
+        putAlerts();
     }
 
     private synchronized void waitUntilCameraCaptureSesssionIsActive() {
@@ -762,13 +852,13 @@ public class CameraActivity extends AppCompatActivity
             planeRenderer.createOnGlThread(this, "models/trigrid.png");
             pointCloudRenderer.createOnGlThread(this);
 
-            virtualObject.createOnGlThread(this, "models/andy.obj", "models/andy.png");
+            virtualObject.createOnGlThread(this, "models/alert.obj", "models/alert.png");
             virtualObject.setMaterialProperties(0.0f, 2.0f, 0.5f, 6.0f);
 
-            virtualObjectShadow.createOnGlThread(
-                    this, "models/andy_shadow.obj", "models/andy_shadow.png");
-            virtualObjectShadow.setBlendMode(BlendMode.Shadow);
-            virtualObjectShadow.setMaterialProperties(1.0f, 0.0f, 0.0f, 1.0f);
+            //virtualObjectShadow.createOnGlThread(
+            //        this, "models/andy_shadow.obj", "models/andy_shadow.png");
+            //virtualObjectShadow.setBlendMode(BlendMode.Shadow);
+            //virtualObjectShadow.setMaterialProperties(1.0f, 0.0f, 0.0f, 1.0f);
 
             openCamera();
         } catch (IOException e) {
@@ -790,12 +880,27 @@ public class CameraActivity extends AppCompatActivity
 
             float[] objColor = new float[] {139.0f, 195.0f, 74.0f, 255.0f};
 
-            // TODO: put alarm info
-            // position of robot
-            float[] transform = new float[] {2.0f, 2.0f, 0.0f};
-            float[] rotation = new float[] {0.0f, 0.0f, 0.0f, 0.0f};
-            Anchor anchor = sharedSession.createAnchor(new Pose(transform, rotation));
-            anchors.add(new ColoredAnchor(anchor, objColor));
+//            float[] transform = new float[]{0.5f, 0.0f, 0.0f};
+//            float[] rotation = new float[]{0.0f, 0.0f, 0.0f, 0.0f};
+//            Anchor anchor = sharedSession.createAnchor(new Pose(transform, rotation));
+//            anchors.add(new ColoredAnchor(anchor, objColor));
+
+            for (AlarmInfo alarmInfo: allAlarmInfos) {
+                double horizontalDistance = SphericalUtil.computeDistanceBetween(
+                        userLocation,
+                        new LatLng(userLocation.latitude, alarmInfo.longitude)
+                );
+                double verticalDistance = SphericalUtil.computeDistanceBetween(
+                        userLocation,
+                        new LatLng(alarmInfo.latitude, userLocation.longitude)
+                );
+                double distance = Math.sqrt(horizontalDistance * horizontalDistance + verticalDistance * verticalDistance);
+
+                float[] transform = new float[]{(float)(horizontalDistance / distance), (float)(horizontalDistance / distance), 0.0f};
+                float[] rotation = new float[]{0.0f, 0.0f, 0.0f, 0.0f};
+                Anchor anchor = sharedSession.createAnchor(new Pose(transform, rotation));
+                anchors.add(new ColoredAnchor(anchor, objColor));
+            }
         }
     }
 
@@ -886,6 +991,9 @@ public class CameraActivity extends AppCompatActivity
         
         putAlarmInfos(frame, camera);
 
+        // Handle screen tap.
+        handleTap(frame, camera);
+
         // If frame is ready, render camera preview image to the GL surface.
         backgroundRenderer.draw(frame);
 
@@ -944,9 +1052,9 @@ public class CameraActivity extends AppCompatActivity
 
             // Update and draw the model and its shadow.
             virtualObject.updateModelMatrix(anchorMatrix, scaleFactor);
-            virtualObjectShadow.updateModelMatrix(anchorMatrix, scaleFactor);
+            //virtualObjectShadow.updateModelMatrix(anchorMatrix, scaleFactor);
             virtualObject.draw(viewmtx, projmtx, colorCorrectionRgba, coloredAnchor.color);
-            virtualObjectShadow.draw(viewmtx, projmtx, colorCorrectionRgba, coloredAnchor.color);
+            //virtualObjectShadow.draw(viewmtx, projmtx, colorCorrectionRgba, coloredAnchor.color);
         }
     }
 
@@ -967,9 +1075,9 @@ public class CameraActivity extends AppCompatActivity
                     // Hits are sorted by depth. Consider only closest hit on a plane or oriented point.
                     // Cap the number of objects created. This avoids overloading both the
                     // rendering system and ARCore.
-                    if (anchors.size() >= 20) {
-                        anchors.get(0).anchor.detach();
-                        anchors.remove(0);
+                    if (this.anchors.size() >= 20) {
+                        this.anchors.get(0).anchor.detach();
+                        this.anchors.remove(0);
                     }
 
                     // Assign a color to the object for rendering based on the trackable type
@@ -987,7 +1095,7 @@ public class CameraActivity extends AppCompatActivity
                     // Adding an Anchor tells ARCore that it should track this position in
                     // space. This anchor is created on the Plane to place the 3D model
                     // in the correct position relative both to the world and to the plane.
-                    anchors.add(new ColoredAnchor(hit.createAnchor(), objColor));
+                    this.anchors.add(new ColoredAnchor(hit.createAnchor(), objColor));
                     break;
                 }
             }
