@@ -19,7 +19,7 @@ import java.util.Map;
 
 public class DataProvider {
     private static DataProvider instance;
-    private static final String BASE_URL = "http://10.0.2.2:5000";
+    private static final String BASE_URL = "http://23.101.6.119:5000";
     private RequestQueue queue;
 
     private DataProvider(Context context) {
