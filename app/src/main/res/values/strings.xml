@@ -12,27 +12,10 @@
     <string name="ok">OK</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="view_map">查看地圖</string>
+    <string name="view_map">查看地图</string>
     <string name="explore">探索</string>
-    <string name="find_friends">尋找好友</string>
-<!--    <string name="signal_type_1">道路结冰</string>-->
-<!--    <string name="signal_type_2">暴雪</string>-->
-<!--    <string name="signal_type_3">暴雨</string>-->
-<!--    <string name="signal_type_4">冰雹</string>-->
-<!--    <string name="signal_type_5">大风</string>-->
-<!--    <string name="signal_type_6">大雾</string>-->
-<!--    <string name="signal_type_7">高温</string>-->
-<!--    <string name="signal_type_8">干旱</string>-->
-<!--    <string name="signal_type_9">寒潮</string>-->
-<!--    <string name="signal_type_10">雷电</string>-->
-<!--    <string name="signal_type_11">霾</string>-->
-<!--    <string name="signal_type_12">沙尘暴</string>-->
-<!--    <string name="signal_type_13">霜冻</string>-->
-<!--    <string name="signal_type_14">台风</string>-->
-<!--    <string name="signal_type_15">道路冰雪</string>-->
-<!--    <string name="signal_type_16">海上大风</string>-->
-<!--    <string name="signal_type_17">寒冷</string>-->
-<!--    <string name="signal_type_18">森林火险</string>-->
+    <string name="find_friends">寻找好友</string>
+    <string name="to_camera">相机模式</string>
     <string-array name="signal_type_array">
         <item>道路结冰</item>
         <item>暴雪</item>
@@ -53,7 +36,6 @@
         <item>寒冷</item>
         <item>森林火险</item>
     </string-array>
-
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="label_sign_up">Sign up</string>

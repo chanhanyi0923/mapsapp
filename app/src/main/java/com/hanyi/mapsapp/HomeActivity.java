@@ -16,6 +16,7 @@ public class HomeActivity extends AppCompatActivity {
         ImageButton toExploreButton = findViewById(R.id.toExploreButton);
         ImageButton toFindFriendsButton = findViewById(R.id.toFindFriendsButton);
         ImageButton toMapViewButton = findViewById(R.id.toMapViewButton);
+        ImageButton toCameraButton = findViewById(R.id.toCameraButton);
 
 
         toMapViewButton.setOnClickListener(new View.OnClickListener() {
@@ -38,6 +39,14 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(HomeActivity.this, ExploreActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        toCameraButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(HomeActivity.this, CameraActivity.class);
                 startActivity(intent);
             }
         });
