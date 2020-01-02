@@ -44,8 +44,7 @@ public class SignUpActivity extends AppCompatActivity {
                                     public void onComplete(Boolean result) {
                                         if (result) {
                                             Toast.makeText(getApplicationContext(), "Success.", Toast.LENGTH_LONG).show();
-                                            Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
-                                            startActivity(intent);
+                                            finish();
                                         } else {
                                             Toast.makeText(getApplicationContext(), "Failed to create account.", Toast.LENGTH_LONG).show();
                                         }

@@ -1,6 +1,9 @@
 package com.hanyi.mapsapp;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,9 +34,19 @@ public class ExploreActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailed(Exception exception) {
-                        Toast.makeText(getApplicationContext(), "Failed to load posts.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), exception.toString(), Toast.LENGTH_LONG).show();
                     }
                 }
         );
+
+        Button buttonPost;
+        buttonPost = findViewById(R.id.buttonPost);
+        buttonPost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ExploreActivity.this, PostActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }

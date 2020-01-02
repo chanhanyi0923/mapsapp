@@ -36,7 +36,7 @@ public class LoginActivity extends AppCompatActivity {
 
                                 @Override
                                 public void onFailed(Exception exception) {
-                                    Toast.makeText(getApplicationContext(), "Failed to sign in.", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getApplicationContext(), "Failed to login.", Toast.LENGTH_LONG).show();
                                 }
                             }
                     );
