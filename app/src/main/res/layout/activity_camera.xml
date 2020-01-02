@@ -12,6 +12,7 @@ tools:context=".CameraActivity">
     android:layout_gravity="top" />
 
 <!-- Layout is set to `horizontal` at runtime whenever display orientation is landscape. -->
+<!--
 <LinearLayout
     android:id="@+id/image_text_layout"
     android:layout_width="wrap_content"
@@ -31,6 +32,7 @@ tools:context=".CameraActivity">
         android:text="Status messages appear here at runtime." />
 
 </LinearLayout>
+-->
 
 <Switch
     android:id="@+id/arcore_switch"
@@ -42,5 +44,15 @@ tools:context=".CameraActivity">
     android:layout_marginTop="22dp"
     android:switchPadding="8dp"
     android:text="AR" />
+
+<com.google.android.material.floatingactionbutton.FloatingActionButton
+    android:id="@+id/cameraReturnToHomeButton"
+    android:layout_alignParentRight="true"
+    android:layout_alignParentTop="true"
+    android:layout_margin="8dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    app:srcCompat="@drawable/ic_close_black_24dp" />
 
 </RelativeLayout>

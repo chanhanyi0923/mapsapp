@@ -46,6 +46,7 @@ import android.util.Log;
 import android.util.Size;
 import android.view.MotionEvent;
 import android.view.Surface;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Switch;
@@ -57,6 +58,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.Camera;
@@ -126,11 +128,11 @@ public class CameraActivity extends AppCompatActivity
     // GL Surface used to draw camera preview image.
     private GLSurfaceView surfaceView;
 
-    // Text view for displaying on screen status message.
-    private TextView statusTextView;
+//    // Text view for displaying on screen status message.
+//    private TextView statusTextView;
 
-    // Linear layout that contains preview image and status text.
-    private LinearLayout imageTextLinearLayout;
+//    // Linear layout that contains preview image and status text.
+//    private LinearLayout imageTextLinearLayout;
 
     // Switch to allow pausing and resuming of ARCore.
     private Switch arcoreSwitch;
@@ -452,8 +454,8 @@ public class CameraActivity extends AppCompatActivity
         tapHelper = new TapHelper(this);
         surfaceView.setOnTouchListener(tapHelper);
 
-        imageTextLinearLayout = findViewById(R.id.image_text_layout);
-        statusTextView = findViewById(R.id.text_view);
+//        imageTextLinearLayout = findViewById(R.id.image_text_layout);
+//        statusTextView = findViewById(R.id.text_view);
         arcoreSwitch = findViewById(R.id.arcore_switch);
 
         // Ensure initial switch position is set based on initial value of `arMode` variable.
@@ -480,6 +482,14 @@ public class CameraActivity extends AppCompatActivity
 
         initLocationManager();
         putAlerts();
+
+        FloatingActionButton cameraReturnToHomeButton = findViewById(R.id.cameraReturnToHomeButton);
+        cameraReturnToHomeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
     }
 
     private synchronized void waitUntilCameraCaptureSesssionIsActive() {
@@ -794,23 +804,23 @@ public class CameraActivity extends AppCompatActivity
         image.close();
         cpuImagesProcessed++;
 
-        // Reduce the screen update to once every two seconds with 30fps if running as automated test.
-        if (!automatorRun.get() || (automatorRun.get() && cpuImagesProcessed % 60 == 0)) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    statusTextView.setText(
-                            "CPU images processed: "
-                                    + cpuImagesProcessed
-                                    + "\n\nMode: "
-                                    + (arMode ? "AR" : "non-AR")
-                                    + " \nARCore active: "
-                                    + arcoreActive
-                                    + " \nShould update surface texture: "
-                                    + shouldUpdateSurfaceTexture.get());
-                }
-            });
-        }
+//        // Reduce the screen update to once every two seconds with 30fps if running as automated test.
+//        if (!automatorRun.get() || (automatorRun.get() && cpuImagesProcessed % 60 == 0)) {
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    statusTextView.setText(
+//                            "CPU images processed: "
+//                                    + cpuImagesProcessed
+//                                    + "\n\nMode: "
+//                                    + (arMode ? "AR" : "non-AR")
+//                                    + " \nARCore active: "
+//                                    + arcoreActive
+//                                    + " \nShould update surface texture: "
+//                                    + shouldUpdateSurfaceTexture.get());
+//                }
+//            });
+//        }
     }
 
     // Android permission request callback.
@@ -910,14 +920,14 @@ public class CameraActivity extends AppCompatActivity
         GLES20.glViewport(0, 0, width, height);
         displayRotationHelper.onSurfaceChanged(width, height);
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                // Adjust layout based on display orientation.
-                imageTextLinearLayout.setOrientation(
-                        width > height ? LinearLayout.HORIZONTAL : LinearLayout.VERTICAL);
-            }
-        });
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                // Adjust layout based on display orientation.
+//                imageTextLinearLayout.setOrientation(
+//                        width > height ? LinearLayout.HORIZONTAL : LinearLayout.VERTICAL);
+//            }
+//        });
     }
 
     // GL draw callback. Will be called each frame on the GL thread.

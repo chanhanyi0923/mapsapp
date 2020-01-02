@@ -12,9 +12,10 @@
     <string name="ok">OK</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="view_map">查看地圖</string>
+    <string name="view_map">查看地图</string>
     <string name="explore">探索</string>
-    <string name="find_friends">尋找好友</string>
+    <string name="find_friends">寻找好友</string>
+    <string name="to_camera">相机模式</string>
     <string name="signal_type_1">道路结冰</string>
     <string name="signal_type_2">暴雪</string>
     <string name="signal_type_3">暴雨</string>
