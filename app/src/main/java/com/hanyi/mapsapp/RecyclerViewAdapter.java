@@ -38,12 +38,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void onBindViewHolder(@NonNull final RecyclerViewHolder holder, final int position) {
         final Post post = postList.get(position);
         holder.textViewUserName.setText(post.getUsername());
-        String location = post.getLatitude() + ", " + post.getLongitude();
+        String location = "Location: " + post.getLatitude() + ", " + post.getLongitude();
         holder.textViewLocation.setText(location);
-        holder.textViewPeopleNum.setText(String.valueOf(post.getPeopleNum()));
-        holder.textViewSignalType.setText(post.getSignalTypeName(context));
-        holder.textViewSignalLevel.setText(String.valueOf(post.getSignalLevel()));
-        holder.textViewMessage.setText(post.getMessage());
+        String peopleNum = "People: " + post.getPeopleNum();
+        holder.textViewPeopleNum.setText(peopleNum);
+        String signalType = "Type: " + post.getSignalTypeName(context);
+        holder.textViewSignalType.setText(signalType);
+        String signalLevel = "Level: " + post.getSignalLevel();
+        holder.textViewSignalLevel.setText(signalLevel);
+        String message = "Message: \n" + post.getMessage();
+        holder.textViewMessage.setText(message);
     }
 
     @Override

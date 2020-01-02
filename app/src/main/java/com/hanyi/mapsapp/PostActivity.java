@@ -77,6 +77,10 @@ public class PostActivity extends AppCompatActivity {
                                 }
                             }
                     );
+                } else if (peopleNum.isEmpty()) {
+                    Toast.makeText(getApplicationContext(), "People number cannot be empty", Toast.LENGTH_LONG).show();
+                } else if (message.isEmpty()) {
+                    Toast.makeText(getApplicationContext(), "Message cannot be empty", Toast.LENGTH_LONG).show();
                 }
             }
         });
