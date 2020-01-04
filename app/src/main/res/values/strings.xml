@@ -34,6 +34,7 @@
         <item>道路冰雪</item>
         <item>海上大风</item>
         <item>寒冷</item>
+        <item>强对流</item>
         <item>森林火险</item>
     </string-array>
     <!-- TODO: Remove or change this placeholder text -->
