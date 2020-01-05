@@ -16,6 +16,7 @@
     <string name="explore">探索</string>
     <string name="find_friends">寻找好友</string>
     <string name="to_camera">相机模式</string>
+    <string name="emergency_call">一键报警</string>
     <string-array name="signal_type_array">
         <item>道路结冰</item>
         <item>暴雪</item>
