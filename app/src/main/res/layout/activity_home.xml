@@ -132,5 +132,37 @@
                     app:layout_constraintBottom_toBottomOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </TableRow>
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_height="wrap_content"
+                android:layout_width="150dp">
+
+                <ImageButton
+                    android:id="@+id/toEmergencyCallButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/find_friends"
+                    android:scaleType="fitXY"
+                    app:layout_constraintBottom_toTopOf="@+id/toEmergencyCallLabel"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/ic_call_black_24dp" />
+
+                <TextView
+                    android:id="@+id/toEmergencyCallLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/emergency_call"
+                    android:textAlignment="center"
+                    android:padding="10dp"
+                    android:textSize="30sp"
+                    app:layout_constraintTop_toBottomOf="@+id/toEmergencyCallButton"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </TableRow>
     </TableLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
