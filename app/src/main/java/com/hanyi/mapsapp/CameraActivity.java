@@ -19,6 +19,7 @@ package com.hanyi.mapsapp;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -888,7 +889,6 @@ public class CameraActivity extends AppCompatActivity
             }
 
 
-            float[] objColor = new float[] {139.0f, 195.0f, 74.0f, 255.0f};
 
 //            float[] transform = new float[]{0.5f, 0.0f, 0.0f};
 //            float[] rotation = new float[]{0.0f, 0.0f, 0.0f, 0.0f};
@@ -896,6 +896,13 @@ public class CameraActivity extends AppCompatActivity
 //            anchors.add(new ColoredAnchor(anchor, objColor));
 
             for (AlarmInfo alarmInfo: allAlarmInfos) {
+                int signalLevelColor = alarmInfo.getSignalLevelColor();
+                float[] objColor = new float[] {
+                        (float)Color.red(signalLevelColor),
+                        (float)Color.green(signalLevelColor),
+                        (float)Color.blue(signalLevelColor),
+                        Color.alpha (signalLevelColor) * 255.0f
+                };
                 double horizontalDistance = SphericalUtil.computeDistanceBetween(
                         userLocation,
                         new LatLng(userLocation.latitude, alarmInfo.longitude)
