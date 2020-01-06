@@ -16,15 +16,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SearchFriendsActivity extends AppCompatActivity {
     private TextView mTextMessage;
+    private Map<String, Integer> nameToId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_friends);
 
+        nameToId = new HashMap<>();
         final ListView listView = findViewById(R.id.findFriendsResult);
         final ImageButton searchFriendsButton = findViewById(R.id.searchFriendsButton);
         final EditText searchFriendsEditText = findViewById(R.id.searchFriendsEditText);
@@ -39,7 +43,9 @@ public class SearchFriendsActivity extends AppCompatActivity {
                     public void onComplete(ArrayList<User> friends) {
                         ArrayList<String> friendNames = new ArrayList<>();
                         for (User friend: friends) {
-                            friendNames.add(friend.firstName + " " + friend.lastName);
+                            String name = friend.firstName + " " + friend.lastName;
+                            nameToId.put(name, friend.id);
+                            friendNames.add(name);
                         }
                         ArrayAdapter adapter = new ArrayAdapter(
                             SearchFriendsActivity.this,
@@ -60,8 +66,19 @@ public class SearchFriendsActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
-                String item = (String) listView.getItemAtPosition(position);
-                Toast.makeText(getApplicationContext(), "You selected : " + item, Toast.LENGTH_SHORT).show();
+                final String name = (String) listView.getItemAtPosition(position);
+                int friendId = nameToId.get(name);
+                DataProvider.getInstance(getApplicationContext()).addFriend(friendId, new IDataCallback<Boolean>() {
+                    @Override
+                    public void onComplete(Boolean result) {
+                        Toast.makeText(getApplicationContext(), "Added: " + name, Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onFailed(Exception exception) {
+                        Toast.makeText(getApplicationContext(), "Failed to add: " + name, Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }

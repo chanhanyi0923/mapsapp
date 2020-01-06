@@ -189,6 +189,48 @@ public class DataProvider {
         queue.add(stringRequest);
     }
 
+    public void addFriend(final int friendId, final IDataCallback<Boolean> callback) {
+        final String url = BASE_URL + "/add_one_friend/";
+        final String token = User.getLoggedInUser().token;
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            callback.onComplete(true);
+                        } catch (Exception e) {
+                            Exception e2 = new Exception("bad response: ", e);
+                            callback.onFailed(e2);
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Exception e = new Exception("http failed");
+                        callback.onFailed(e);
+                    }
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> params = new HashMap<>();
+                params.put("Authorization", "Bearer " + token);
+                return params;
+            }
+
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("account_id", Integer.toString(User.getLoggedInUser().id));
+                params.put("added_account_id", Integer.toString(friendId));
+                return params;
+            }
+        };
+        queue.add(stringRequest);
+    }
+
     public void postEmergencyPost(final double latitude, final double longitude,
                                   final int signalType, final int signalLevel, final String message,
                                   final int peopleNum, final IDataCallback<Boolean> callback) {
