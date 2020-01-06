@@ -37,6 +37,8 @@
         <item>寒冷</item>
         <item>强对流</item>
         <item>森林火险</item>
+        <item>雪灾</item>
+        <item>降温</item>
     </string-array>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
